@@ -3,7 +3,8 @@ name: rules-audit
 description: >-
   Audit a repo's always-on instruction context — CLAUDE.md / CLAUDE.local.md
   and .claude/rules/*.md — across three dimensions: staleness (references to
-  paths/files that no longer exist), always-on token budget (oversized files,
+  paths/files that no longer exist, or guidance that no longer matches the
+  code), always-on token budget (oversized files,
   or content that should load on-demand instead of every session), and
   duplication/contradiction across the context layer. Use this whenever the
   user wants to audit, review, lint, or clean up their rules or CLAUDE.md:
@@ -78,18 +79,39 @@ renders **no verdicts**. Reference categories, and how much to trust each:
 If code execution is unavailable, fall back to reading the files directly; do
 not block the audit on the script.
 
-## Step 2 — Staleness / dead references
+## Step 2 — Staleness: dead references + obsolete guidance
 
-For each `stale` reference, confirm it really is dead and propose the fix:
-point it at the current path, or remove the line if the thing is gone. Use
-judgment on WHERE it lives — an actively-runnable snippet (a command block) that
-is wrong is worse than a historical note (a "parked task", a changelog entry)
-that mentions an old path on purpose. Fix the former; flag the latter and let
-the user decide rather than rewriting their own record.
+Two facets, very different precision.
+
+**(a) Dead references — deterministic, high-precision.** For each `stale`
+reference from the scan, confirm it really is dead and propose the fix: point it
+at the current path, or remove the line if the thing is gone. Use judgment on
+WHERE it lives — an actively-runnable snippet (a command block) that is wrong is
+worse than a historical note (a "parked task", a changelog entry) that mentions
+an old path on purpose. Fix the former; flag the latter and let the user decide
+rather than rewriting their own record.
 
 Do not "fix" `partial` / `unresolved` / `external` references unless you have
 specific evidence they're wrong — that is the noise the precision tuning exists
 to let you ignore.
+
+**(b) Obsolete guidance — judgment, lower precision.** Beyond dead file paths,
+a rule can go stale in its *prose*: advice for a feature that was removed, a
+convention the project has since dropped, a "we always do X" that the code no
+longer does. The scan cannot see this — it needs you to read each rule's claims
+against the current reality of the repo. When something looks obsolete:
+
+- **Cite evidence.** Name the file/commit/behavior that contradicts the rule.
+  No "this feels outdated" — if you can't point to proof, don't flag it.
+- **Propose, never delete on your own judgment.** This is always-on context the
+  user relies on; a wrong "obsolete" call quietly removes guidance they wanted.
+  Surface it as a question ("Rule X says Y, but Z — still accurate?"), not an
+  edit.
+- **Default to keeping.** This facet is deliberately low-recall: when unsure,
+  leave it. A missed stale line is cheaper than deleting a rule that was right.
+
+This is the systematized, propose-first version of "remove anything no longer
+needed" — the honesty rules above are exactly what keep it from over-pruning.
 
 ## Step 3 — Always-on token budget
 

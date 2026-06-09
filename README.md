@@ -8,7 +8,8 @@ without touching anything unless you say so.
 These files load into context *every session*, so they're worth keeping
 accurate, lean, and non-duplicative. The skill reviews three dimensions:
 
-1. **Staleness** — references to paths/files that no longer exist (dead links).
+1. **Staleness** — references to paths/files that no longer exist (dead links),
+   or guidance whose prose no longer matches the code (obsolete advice).
 2. **Always-on token budget** — files that are oversized, or carry content that
    should load on-demand (a skill or a `docs/` file) rather than every session.
 3. **Duplication & contradiction** — the same (or conflicting) guidance stated
