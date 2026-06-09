@@ -1,0 +1,6 @@
+# Local, repo-/user-specific lessons — never published
+*.local.md
+
+# Python bytecode
+__pycache__/
+*.pyc

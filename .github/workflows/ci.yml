@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Byte-compile the pre-scan
+        run: python -m py_compile scripts/scan_rules.py
+
+      - name: Smoke-run the pre-scan on this repo's own SKILL.md
+        run: |
+          python scripts/scan_rules.py --path SKILL.md > out.json
+          python -c "import json; d=json.load(open('out.json')); assert len(d['files']) >= 1, d; print('files scanned:', len(d['files']))"
